@@ -27,6 +27,7 @@ type
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
     procedure FormCreate(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure Image1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
@@ -47,7 +48,7 @@ var
   Form1: TForm1;
   op: Integer;
   desenhar, linhar : Boolean;
-  m: Float;
+  m,dx,dy: Float;
   x1,y1,x2,y2,x,y,inc: Integer;
 
 implementation
@@ -57,6 +58,11 @@ implementation
 { TForm1 }
 
 procedure TForm1.FormCreate(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.Image1Click(Sender: TObject);
 begin
 
 end;
@@ -94,12 +100,13 @@ begin
   if (op = 1) then desenhar := false;
   if (op = 2) then Image1.Canvas.LineTo(X,Y);
   if ((op = 3) and (linhar = true)) then
-  begin
+  begin // desenhar linhas manuais
     x2 := X;
     Edit5.Text := IntToStr(x2);
     y2 := Y;
     Edit6.Text := IntToStr(y2);
-    if(x2=x1) then   // linha vertical
+    dx := Trunc(x2-x1);
+    if( abs(dx) = 0 ) then   // linha vertical
     begin
       if(y1<y2) then
       begin
@@ -109,43 +116,48 @@ begin
       begin
         for y := y2 to y1 do Image1.Canvas.Pixels[x1,y] := clred;
       end;
-    end;
-
-    m := abs(y2 - y1)/abs(x2-x1);
-
-    if(abs(y2-y1) <= abs(x2-x1)) then   // linha mais horizonatl
+    end
+    else
     begin
-      if(x1 < x2) then
-      begin
-        inc := 1;
-      end
-        else inc := -1;
+      m := abs(y2 - y1)/abs(dx);
 
+      if(abs(y2-y1) <= abs(x2-x1)) then   // linha mais horizonatl
+      begin
+        if(x1 < x2) then
+        begin
+          inc := 1;
+        end
+          else inc := -1;
+        x := x1;
+        y := y1;
         while(x <> x2) do
-      begin
-           y := Trunc((x - x1)/m) + y1;
-           Image1.Canvas.Pixels[x,y] := clred;
-           x := x + inc;
+        begin
+             y := Round((x - x1)/m) + y1;
+             Image1.Canvas.Pixels[x,y] := clred;
+             x := x + inc;
+        end;
       end;
-    end;
 
-    if(abs(y2-y1) > abs(x2-x1)) then   // linha mais vertical
-    begin
-      if(y1 < y2) then
+      if(abs(y2-y1) > abs(x2-x1)) then   // linha mais vertical
       begin
-        inc := 1;
-      end
-      else inc := -1;
-      while(y <> y2) do
-      begin
-           x := Trunc((y - y1)/m) + x1;
-           Image1.Canvas.Pixels[x,y] := clred;
-           y := y + inc;
+        if(y1 > y2) then
+        begin
+          inc := 1;
+        end
+        else inc := -1;
+        x := x1;
+        y := y1;
+        while(y <> y2) do
+        begin
+             x := Trunc((y - y1)/m) + x1;
+             Image1.Canvas.Pixels[x,y] := clred;
+             y := y + inc;
+        end;
       end;
     end;
     linhar := false;
+    end;
   end;
-end;
 
 procedure TForm1.MenuItem2Click(Sender: TObject);
 begin

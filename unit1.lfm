@@ -14,6 +14,7 @@ object Form1: TForm1
     Height = 320
     Top = 8
     Width = 352
+    OnClick = Image1Click
     OnMouseDown = Image1MouseDown
     OnMouseMove = Image1MouseMove
     OnMouseUp = Image1MouseUp
