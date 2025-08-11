@@ -119,11 +119,11 @@ begin
     end
     else
     begin
-      m := abs(y2 - y1)/abs(dx);
+      m := (y2 - y1)/(dx);
 
       if(abs(y2-y1) <= abs(x2-x1)) then   // linha mais horizonatl
       begin
-        if(x1 < x2) then
+        if(x1 <= x2) then
         begin
           inc := 1;
         end
@@ -132,7 +132,8 @@ begin
         y := y1;
         while(x <> x2) do
         begin
-             y := Trunc((x - x1)/m) + y1;
+             m := (y2 - y1)/(x2-x1);
+             y := Round((x - x1)*m) + y1;
              Image1.Canvas.Pixels[x,y] := clred;
              x := x + inc;
         end;
@@ -149,7 +150,8 @@ begin
         y := y1;
         while(y <> y2) do
         begin
-             x := Trunc((y - y1)/m) + x1;
+             m := (y2 - y1)/(x2-x1);
+             x := Round((y - y1)/m) + x1;
              Image1.Canvas.Pixels[x,y] := clred;
              y := y + inc;
         end;
