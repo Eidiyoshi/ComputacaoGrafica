@@ -26,6 +26,8 @@ type
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Image1Click(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
@@ -34,10 +36,11 @@ type
       );
     procedure Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure MenuItem2Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
+    procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem7Click(Sender: TObject);
   private
 
   public
@@ -49,7 +52,8 @@ var
   op: Integer;
   desenhar, linhar : Boolean;
   m,dx,dy: Float;
-  x1,y1,x2,y2,x,y,inc: Integer;
+  x1,y1,x2,y2,x,y,xc,yc,inc: Integer;
+  R,xr,yr,a : Real;
 
 implementation
 
@@ -70,19 +74,27 @@ end;
 procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if (op = 1) then desenhar := true;
+  if (op = 1) then
+  begin
+       desenhar := true;
+       end;
   if (op = 2) then
   begin                              
     Image1.Canvas.Pen.Color := clred;
     Image1.Canvas.MoveTo(X,Y);
   end;
-  if ((op = 3) and (linhar = false))  then
+  if ((op = 3) and (linhar = false))  then // linhas manuais
   begin
     x1 := X;
     Edit3.Text := IntToStr(x1);
     y1 := Y;
     Edit4.Text := IntToStr(y1);
     linhar := true;
+  end;
+  if ((op = 5) or (op = 6) or (op = 7)) then // circunferencia
+  begin
+       xc := X;
+       yc := Y;
   end;
 end;
 
@@ -143,9 +155,9 @@ begin
       begin
         if(y1 > y2) then
         begin
-          inc := 1;
+          inc := -1;
         end
-        else inc := -1;
+        else inc := 1;
         x := x1;
         y := y1;
         while(y <> y2) do
@@ -159,11 +171,34 @@ begin
     end;
     linhar := false;
     end;
+  if(op = 4) then
+  begin // desenhar linhas bresenham
+       x := X;
   end;
-
-procedure TForm1.MenuItem2Click(Sender: TObject);
-begin
-
+  if(op = 5) then
+  begin // circunferencia
+       R := sqrt((xc-X)*(xc-X) + (yc-Y)*(yc-Y));
+       xr := -R;
+       while (xr < R) do
+       begin
+            yr := sqrt(R*R - xr*xr);
+            Image1.Canvas.Pixels[round(xc+xr),round(yc+yr)] := clred;
+            Image1.Canvas.Pixels[round(xc+xr),round(yc-yr)] := clred;
+            xr := xr + 0.01;
+       end;
+  end;
+  if(op = 6) then
+  begin // circunferencia parametrica                 
+        R := sqrt((xc-X)*(xc-X) + (yc-Y)*(yc-Y));
+        a := 0;
+        while(a < 6.28) do
+        begin
+             xr := R * cos(a);
+             yr := R * sin (a);
+             Image1.Canvas.Pixels[round(xc+xr),round(yc+yr)] := clred;
+             a := a + 0.01;
+        end;
+  end;
 end;
 
 procedure TForm1.MenuItem3Click(Sender: TObject);
@@ -179,6 +214,16 @@ end;
 procedure TForm1.MenuItem5Click(Sender: TObject);
 begin
   op := 3 // desenhar linhas na "mão"
+end;
+
+procedure TForm1.MenuItem6Click(Sender: TObject);
+begin
+  op := 5;
+end;
+
+procedure TForm1.MenuItem7Click(Sender: TObject);
+begin
+  op := 6;
 end;
 
 end.
