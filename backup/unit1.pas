@@ -28,6 +28,7 @@ type
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure Image1Click(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
@@ -41,6 +42,7 @@ type
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
+    procedure MenuItem8Click(Sender: TObject);
   private
 
   public
@@ -52,8 +54,8 @@ var
   op: Integer;
   desenhar, linhar : Boolean;
   m,dx,dy: Float;
-  x1,y1,x2,y2,x,y,xc,yc,inc: Integer;
-  R,xr,yr,a : Real;
+  x1,y1,x2,y2,x,y,xc,yc,inc,i: Integer;
+  R,xr,yr,a,sen1,cos1,xn : Real;
 
 implementation
 
@@ -194,9 +196,23 @@ begin
         while(a < 6.28) do
         begin
              xr := R * cos(a);
-             yr := R * sin (a);
+             yr := R * sin(a);
              Image1.Canvas.Pixels[round(xc+xr),round(yc+yr)] := clred;
              a := a + 0.01;
+        end;
+  end;
+  if(op = 7) then
+  begin // circ sen1
+        xr := sqrt((xc-X)*(xc-X) + (yc-Y)*(yc-Y));
+        yr := 0;
+        cos1 := cos(1);
+        sen1 := sin(1);
+        for i := 1 to 360 do
+        begin
+          xn := xr * cos1 - yr * sen1;
+          yr := xr * sen1 + yr * cos1;
+          x := xn;
+          Image1.Canvas.Pixels[round(xc+xr),round(yc+yr)] := clred;
         end;
   end;
 end;
@@ -218,12 +234,17 @@ end;
 
 procedure TForm1.MenuItem6Click(Sender: TObject);
 begin
-  op := 5;
+  op := 5;   // circ
 end;
 
 procedure TForm1.MenuItem7Click(Sender: TObject);
 begin
-  op := 6;
+  op := 6;   // circ parametrica
+end;
+
+procedure TForm1.MenuItem8Click(Sender: TObject);
+begin
+  op := 7;  // circ sin1
 end;
 
 end.

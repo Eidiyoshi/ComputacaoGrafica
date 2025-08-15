@@ -95,6 +95,10 @@ object Form1: TForm1
         Caption = 'Desenhar CircParametrica'
         OnClick = MenuItem7Click
       end
+      object MenuItem8: TMenuItem
+        Caption = 'Desenhar CircSen1'
+        OnClick = MenuItem8Click
+      end
     end
   end
 end
