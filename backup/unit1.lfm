@@ -80,12 +80,16 @@ object Form1: TForm1
         OnClick = MenuItem3Click
       end
       object MenuItem4: TMenuItem
-        Caption = 'Desenhar linha'
+        Caption = 'Desenhar linha lineTo'
         OnClick = MenuItem4Click
       end
       object MenuItem5: TMenuItem
-        Caption = 'Desenhar linhas2'
+        Caption = 'Desenhar linha usando pixels'
         OnClick = MenuItem5Click
+      end
+      object MenuItem9: TMenuItem
+        Caption = 'Desenhar linha bresenham(wip)'
+        OnClick = MenuItem9Click
       end
       object MenuItem6: TMenuItem
         Caption = 'Desenhar Circunferencia'
