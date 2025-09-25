@@ -14,12 +14,18 @@ type
 
   TForm1 = class(TForm)
     Edit1: TEdit;
+    Edit10: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit4: TEdit;
     Edit5: TEdit;
     Edit6: TEdit;
+    Edit7: TEdit;
+    Edit8: TEdit;
+    Edit9: TEdit;
     Image1: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
@@ -61,7 +67,7 @@ var
   desenhar, linhar : Boolean;
   m,dx,dy: Float;
   x1,y1,x2,y2,x,y,xc,yc,inc,incx,incy,i,setor,direcao,raio,h,dEC,dSE,clip,x3,y3: Integer;
-  x4,y4,xLeft,xRight,yTop,yBottom,limX,limY,xLim,yLim, desenho,aux, cod1,cod2: Integer;
+  x4,y4,xLeft,xRight,yTop,yBottom,esq,dir,cima,baixo, desenho,aux, cod1,cod2: Integer;
   R,xr,yr,a,sen1,cos1,xn,d,dE,dNE,hr : Real;
 
 implementation
@@ -180,6 +186,11 @@ begin
       end;
       desenho := 1;
       clip := 2;
+
+    Edit7.Text := IntToStr(xLeft);
+    Edit8.Text := IntToStr(xRight);
+    Edit9.Text := IntToStr(yTop);
+    Edit10.Text := IntToStr(yBottom);
     end;
 
     if(clip = 0) then  //fazercaixa
@@ -415,8 +426,43 @@ begin
 
     if((cod1 and cod2) = 0) then
     begin
-      Image1.Canvas.Pen.Color := clred;
-      if((cod1 = 0)and(cod2 = 0)) then Image1.Canvas.Line(x1,y1,x2,y2); // dois pontos dentro do quadrado
+        Image1.Canvas.Pen.Color := clred;
+        if(cod1 = 0) then //ponto 1 dentro
+        begin
+          x3 := x1;
+          y3 := y1;
+        end;
+        if(cod2 = 0) then //ponto2 dentro
+        begin
+          x4 := x2;
+          y4 := y2;
+        end;
+
+        // fora do quadrado
+        if(x1 <> x2) then m := (y2-y1)/(x2-x1);
+        if(x1 = x2) then m := (y2-y1)/(x2-x1+0.1);
+        if(m = 0) then m := 0.1;
+
+        // descobrir limites
+        esq := trunc(m*(xLeft - x1)) + y1;
+        dir := trunc(m*(xRight - x1)) + y1;
+        cima := trunc((yTop-y1)/m) + x1;
+        baixo := trunc((yBottom - y1)/m) + x1;
+
+        if((cod1 and 1) = 1) then begin y3 := esq; x3 := xLeft; end;
+        if((cod1 and 2) = 2) then begin y3 := dir; x3 := xRight; end;
+        if((cod1 and 4) = 4) then begin x3 := baixo; y3 := yBottom; end;
+        if((cod1 and 8) = 8) then begin x3 := cima; y3 := yTop; end;
+        if(((cod1 and 9) = 9)and((cod2 and 4) = 4) ) then begin y3 := esq; x3:= xLeft; end;
+        if(((cod1 and 10) = 10)and((cod2 and 4) = 4) ) then begin y3 := dir; x3:= xRight; end;
+
+        if((cod2 and 1) = 1) then begin y4 := esq; x4 := xLeft; end;
+        if((cod2 and 2) = 2) then begin y4 := dir; x4 := xRight; end;
+        if((cod2 and 4) = 4) then begin x4 := baixo; y4 := yBottom; end;
+        if((cod2 and 8) = 8) then begin x4 := cima; y4 := yTop; end;
+
+        Image1.Canvas.Pen.Color := clred;
+        Image1.Canvas.Line(x3,y3,x4,y4);
 
       desenho := 1;
       end;
