@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 96
+  Left = 173
   Height = 616
-  Top = 198
+  Top = 247
   Width = 1010
   Caption = 'Form1'
   ClientHeight = 616
@@ -102,6 +102,14 @@ object Form1: TForm1
       object MenuItem8: TMenuItem
         Caption = 'Desenhar CircSen1'
         OnClick = MenuItem8Click
+      end
+      object MenuItem10: TMenuItem
+        Caption = 'Desenhar circBresenham'
+        OnClick = MenuItem10Click
+      end
+      object MenuItem11: TMenuItem
+        Caption = 'Desenhar retas clipping'
+        OnClick = MenuItem11Click
       end
     end
   end

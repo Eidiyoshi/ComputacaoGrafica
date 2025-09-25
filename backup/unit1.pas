@@ -22,6 +22,8 @@ type
     Image1: TImage;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    MenuItem10: TMenuItem;
+    MenuItem11: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
@@ -38,6 +40,8 @@ type
       );
     procedure Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure MenuItem10Click(Sender: TObject);
+    procedure MenuItem11Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
@@ -56,8 +60,9 @@ var
   op: Integer;
   desenhar, linhar : Boolean;
   m,dx,dy: Float;
-  x1,y1,x2,y2,x,y,xc,yc,inc,incx,incy,i: Integer;
-  R,xr,yr,a,sen1,cos1,xn,d,dE,dNE : Real;
+  x1,y1,x2,y2,x,y,xc,yc,inc,incx,incy,i,setor,direcao,raio,h,dEC,dSE,clip,x3,y3: Integer;
+  x4,y4,xLeft,xRight,yTop,yBottom,limX,limY,xLim,yLim, desenho,aux, cod1,cod2: Integer;
+  R,xr,yr,a,sen1,cos1,xn,d,dE,dNE,hr : Real;
 
 implementation
 
@@ -98,7 +103,7 @@ begin
     linhar := true;
   end;
 
-  if( op = 4 ) then   // linha bresenham
+  if( (op = 4) ) then   // linhas
   begin
     x1 := X;
     Edit3.Text := IntToStr(x1);
@@ -106,10 +111,85 @@ begin
     Edit4.Text := IntToStr(y1);
   end;
 
-  if ((op = 5) or (op = 6) or (op = 7)) then // circunferencia
+  if ((op = 5) or (op = 6) or (op = 7) or (op = 8)) then // circunferencias
   begin
        xc := X;
        yc := Y;
+  end;
+
+  if(op = 9) then // clipping
+  begin
+    if((desenho = 1) or (desenho = 2)) then //desenhar linha
+    begin
+      cod1 := 0;
+      x1 := X;
+      Edit3.Text := IntToStr(x1);
+      y1 := Y;                   
+      Edit4.Text := IntToStr(y1);
+      desenho := 2;
+
+      cod1 := 0;
+      if(x1<xLeft) then cod1 := cod1 + 1;//0001
+      if(x1>xRight) then cod1 := cod1 + 2; //0010
+      if(y1>yBottom) then cod1 := cod1 + 4;//0100
+      if(y1<yTop) then cod1 := cod1 + 8;//1000
+    end;
+
+    if(clip = 1) then //fazercaixa
+    begin
+      x4 := X;
+      Edit5.Text := IntToSTr(x4);
+      y4 := Y;
+      Edit6.Text := IntToSTr(y4);
+
+      xLeft := x3;
+      xRight := x4;
+      yBottom := y4;
+      yTop := y3;
+
+      x := x3;
+      y := y3;
+      incx := 1;
+      incy := 1;
+      if(x3>x4) then
+      begin
+           incx := -1;
+           xLeft := x4;
+           xRight := x3;
+      end;
+
+      if(y3>y4) then
+      begin
+        incy := -1;
+        yBottom := y3;
+        yTop := y4;
+      end;
+
+      while(x <> x4) do
+      begin
+        Image1.Canvas.Pixels[x,y3] := clred;
+        Image1.Canvas.Pixels[x,y4] := clred;
+        x := x +incx;
+      end;
+
+      while(y <> y4) do
+      begin
+        Image1.Canvas.Pixels[x3,y] := clred;
+        Image1.Canvas.Pixels[x4,y] := clred;
+        y := y + incy;
+      end;
+      desenho := 1;
+      clip := 2;
+    end;
+
+    if(clip = 0) then  //fazercaixa
+    begin
+      x3 := X;
+      Edit3.Text := IntToSTr(x3);
+      y3 := Y;
+      Edit4.Text := IntToSTr(y3);
+      clip := 1;
+    end;
   end;
 end;
 
@@ -190,7 +270,7 @@ begin
     end;
 
   if(op = 4) then
-  begin // desenhar linhas bresenham
+  begin // desenhar linhas bresenham WIP
 
         x2 := X;
         y2 := Y;
@@ -210,21 +290,23 @@ begin
         incx := 1;
         incy := 1;
 
-        if( dy < 0 ) then
-        begin
-        incy := -1;
-        end;
+        if( dy < 0 ) then incy := -1;
+        if( dx < 0 ) then incx := -1;
+        if( dx > dy ) then direcao := 1;  //horizontal
+        if( dy > dx ) then direcao := 0;  //vertical
 
-        if( dx < 0 ) then
-        begin
-        incx := -1;
-        end;
+        setor := 1;
+        if((direcao = 0) and (y2>y1) and (x2>x1)) then setor := 2;
+        if((direcao = 0) and (y2>y1) and (x1>x2)) then setor := 3;
+        if((direcao = 1) and (y2>y1) and (x1>x2)) then setor := 4;
+        if((direcao = 1) and (y1>y2) and (x1>x2)) then setor := 5;
+        if((direcao = 0) and (y1>y2) and (x1>x2)) then setor := 6;
+        if((direcao = 0) and (y1>y2) and (x2>x1)) then setor := 7;
+        if((direcao = 1) and (y1>y2) and (x2>x1)) then setor := 8;
 
-        if(abs(x2-x1) > abs(y2-y1)) then   // linha mais horizontal
+        while( x <> x2 ) do
         begin
-          while( x <> x2 ) do
-          begin
-              if( d < 0 ) then
+             if( d < 0 ) then
                 begin
                   d := d + dE;
                   x := x + incx;
@@ -235,30 +317,16 @@ begin
                   x := x + incx;
                   y := y + incy;
                 end;
-              Image1.Canvas.Pixels[x,y] := clred;
+              if( setor = 1 ) then Image1.Canvas.Pixels[x,y] := clred;  
+              if( setor = 2 ) then Image1.Canvas.Pixels[y,x] := clred;
+              if( setor = 3 ) then Image1.Canvas.Pixels[y,-x] := clred;
+              if( setor = 4 ) then Image1.Canvas.Pixels[-x,y] := clred;
+              if( setor = 5 ) then Image1.Canvas.Pixels[-x,-y] := clred;
+              if( setor = 6 ) then Image1.Canvas.Pixels[-y,-x] := clred;
+              if( setor = 7 ) then Image1.Canvas.Pixels[y,-x] := clred;
+              if( setor = 8 ) then Image1.Canvas.Pixels[-x,y] := clred;
           end;
-        end;
 
-        if(abs(y2-y1) >= abs(x2-x1)) then   // linha mais vertical
-        begin
-          while(y <> y2) do
-          begin
-              if( d < 0 ) then
-                begin
-                  d := d + dE;
-                  y := y + incy;
-                end
-              else
-                begin
-                  d := d + dNE;
-                  y := y + incy;
-                  x := x + incx;
-                end;
-              Image1.Canvas.Pixels[x,y] := clred;
-          end;
-        end;
-       incx := 1;
-       incy := 1;
   end;
 
   if(op = 5) then
@@ -301,6 +369,70 @@ begin
           Image1.Canvas.Pixels[round(xc+xr),round(yc+yr)] := clred;
         end;
   end;
+
+  if(op = 8) then //circunferencia bresenham WIP
+  begin
+    raio := abs(xc - X);
+    x := xc;
+    y := x + raio;
+    h := 1 - raio;
+    dEC := 3;
+    dSE := (-2 * raio) + 5;
+    Image1.Canvas.Pixels[x,y] := clred;
+    while ( x < y ) do
+    begin
+      if( h < 0) then
+      begin
+        h := h + dEC;
+        dEC := dEC + 2;
+        dSE := dSE + 2;
+      end
+      else
+      begin
+        h := h + dSE;
+        dEC := dEC + 2;
+        dSE := dSE + 4;
+        y := y - 1;
+      end;
+      x := x + 1;
+      Image1.Canvas.Pixels[x,y] := clred;
+    end;
+
+  end;
+
+  if( (op = 9) and (desenho = 2)) then // clipping
+  begin
+    x2 := X;
+    Edit5.Text := IntToStr(x2);
+    y2 := Y;                   
+    Edit6.Text := IntToStr(y2);
+
+    cod2 := 0;
+    if(x2<xLeft) then cod2 := cod2 + 1;//0001
+    if(x2>xRight) then cod2 := cod2 + 2; //0010
+    if(y2>yBottom) then cod2 := cod2 + 4;//0100
+    if(y2<yTop) then cod2 := cod2 + 8;//1000
+
+    if((cod1 and cod2) = 0) then
+    begin
+      Image1.Canvas.Pen.Color := clred;
+      if((cod1 = 0)and(cod2 = 0)) then Image1.Canvas.Line(x1,y1,x2,y2); // dois pontos dentro do quadrado
+
+      desenho := 1;
+      end;
+    end;
+end;
+
+procedure TForm1.MenuItem10Click(Sender: TObject);
+begin
+  op := 8; // circ bresenham
+end;
+
+procedure TForm1.MenuItem11Click(Sender: TObject);
+begin
+  op := 9; // reta clipping
+  clip := 0;
+  desenho := 0;
 end;
 
 procedure TForm1.MenuItem3Click(Sender: TObject);
