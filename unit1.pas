@@ -288,56 +288,72 @@ begin
         Edit5.Text := IntToStr(x2);
         Edit6.Text := IntToStr(y2);
 
-        dx := x2 - x1;
-        dy := y2 - y1;
-
-        d := 2 * dy - dx;
-        dE := 2 * dy;
-        dNE := 2 * ( dy - dx );
-        x := x1;
-        y := y1;
-        Image1.Canvas.Pixels[x,y] := clred;
-
-        incx := 1;
-        incy := 1;
-
-        if( dy < 0 ) then incy := -1;
-        if( dx < 0 ) then incx := -1;
-        if( dx > dy ) then direcao := 1;  //horizontal
-        if( dy > dx ) then direcao := 0;  //vertical
-
-        setor := 1;
-        if((direcao = 0) and (y2>y1) and (x2>x1)) then setor := 2;
-        if((direcao = 0) and (y2>y1) and (x1>x2)) then setor := 3;
-        if((direcao = 1) and (y2>y1) and (x1>x2)) then setor := 4;
-        if((direcao = 1) and (y1>y2) and (x1>x2)) then setor := 5;
-        if((direcao = 0) and (y1>y2) and (x1>x2)) then setor := 6;
-        if((direcao = 0) and (y1>y2) and (x2>x1)) then setor := 7;
-        if((direcao = 1) and (y1>y2) and (x2>x1)) then setor := 8;
-
-        while( x <> x2 ) do
+        if(abs(y2 - y1) < abs(x2 - x1)) then
         begin
-             if( d < 0 ) then
-                begin
-                  d := d + dE;
-                  x := x + incx;
-                end
-              else
-                begin
-                  d := d + dNE;
-                  x := x + incx;
-                  y := y + incy;
-                end;
-              if( setor = 1 ) then Image1.Canvas.Pixels[x,y] := clred;  
-              if( setor = 2 ) then Image1.Canvas.Pixels[y,x] := clred;
-              if( setor = 3 ) then Image1.Canvas.Pixels[y,-x] := clred;
-              if( setor = 4 ) then Image1.Canvas.Pixels[-x,y] := clred;
-              if( setor = 5 ) then Image1.Canvas.Pixels[-x,-y] := clred;
-              if( setor = 6 ) then Image1.Canvas.Pixels[-y,-x] := clred;
-              if( setor = 7 ) then Image1.Canvas.Pixels[y,-x] := clred;
-              if( setor = 8 ) then Image1.Canvas.Pixels[-x,y] := clred;
+          if(x1 > x2) then  // ponto1 smp ser o menor
+          begin
+               aux := x1;
+               x1 := x2;
+               x2 := aux;
+               aux := y1;
+               y1 := y2;
+               y2 := aux;
           end;
 
+          dx := x2 - x1;
+          dy := y2 - y1;
+          incy := 1;
+          if(dy < 0) then begin incy := -1; dy := -dy; end;
+          d := (2*dy) - dx;
+          y := y1;
+
+          for x := x1 to x2 do
+          begin
+            Image1.Canvas.Pixels[x,y] := clred;
+            if(d > 0) then
+            begin
+              y := y + incy;
+              d := d + (2 * ( dy - dx));
+            end
+            else
+            begin
+              d := d + 2*dy;
+            end;
+          end;;
+        end;
+        if(abs(y2-y1)>=abs(x2-x1)) then
+        begin
+          if(y1 > y2) then  // ponto1 smp ser o menor
+          begin
+               aux := y1;
+               y1 := y2;
+               y2 := aux;
+               aux := x1;
+               x1 := x2;
+               x2 := aux;
+          end;
+
+          dy := y2 - y1;
+          dx := x2 - x1;
+          incx := 1;
+          if(dx < 0) then begin incx := -1; dx := -dx; end;
+          d := (2*dx) - dy;
+          x := x1;
+
+          for y := y1 to y2 do
+          begin
+            Image1.Canvas.Pixels[x,y] := clred;
+            if(d > 0) then
+            begin
+              x := x + incx;
+              d := d + (2 * (dx - dy));
+            end
+            else
+            begin
+              d := d + 2*dx;
+            end;
+          end;
+        end;
   end;
 
   if(op = 5) then
@@ -458,6 +474,8 @@ begin
         if((cod2 and 2) = 2) then begin y4 := dir; x4 := xRight; end;
         if((cod2 and 4) = 4) then begin x4 := baixo; y4 := yBottom; end;
         if((cod2 and 8) = 8) then begin x4 := cima; y4 := yTop; end;
+
+
 
         Image1.Canvas.Pen.Color := clred;
         Image1.Canvas.Line(x3,y3,x4,y4);
